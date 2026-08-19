@@ -1,0 +1,6 @@
+{
+  "name": "OmniFiles",
+  "description": "A feature-rich file manager with security, cleaning, and storage health tools in a transparent liquid UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
