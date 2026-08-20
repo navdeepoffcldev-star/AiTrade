@@ -22,7 +22,7 @@ jobs:
 
       - name: Setup Required Keys & Configs
         run: |
-          # 1. Create debug keystore in root and app folders
+          # 1. Create debug keystore
           mkdir -p ~/.android app
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           cp debug.keystore app/debug.keystore 2>/dev/null || true
@@ -67,11 +67,9 @@ jobs:
             cp .env.example .env
           fi
 
-      - name: Setup Gradle Wrapper
+      - name: Setup Gradle 9.7 Wrapper
         run: |
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper
-          fi
+          gradle wrapper --gradle-version 9.7.0 --distribution-type all
           chmod +x gradlew
 
       - name: Build Debug APK
