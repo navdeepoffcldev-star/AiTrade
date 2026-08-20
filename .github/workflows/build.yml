@@ -18,7 +18,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
       - name: Setup Required Keys & Configs
         run: |
@@ -67,9 +66,23 @@ jobs:
             cp .env.example .env
           fi
 
-      - name: Setup Gradle 9.7 Wrapper
+      - name: Configure Gradle Wrapper (9.3.1)
         run: |
-          gradle wrapper --gradle-version 9.7.0 --distribution-type all
+          mkdir -p gradle/wrapper
+          cat << 'EOF' > gradle/wrapper/gradle-wrapper.properties
+          distributionBase=GRADLE_USER_HOME
+          distributionPath=wrapper/dists
+          distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip
+          networkTimeout=10000
+          validateDistributionUrl=true
+          zipStoreBase=GRADLE_USER_HOME
+          zipStorePath=wrapper/dists
+          EOF
+
+          # Ensure gradlew exists and is executable
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper --gradle-version 9.3.1
+          fi
           chmod +x gradlew
 
       - name: Build Debug APK
