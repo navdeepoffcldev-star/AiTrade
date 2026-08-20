@@ -2,13 +2,15 @@ name: Build Android APK
 
 on:
   push:
+    branches: [ "**" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -16,20 +18,29 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Android SDK Environment
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          if [ -f ".env.example" ] && [ ! -f ".env" ]; then
+            cp .env.example .env
+          fi
 
-      - name: Generate Wrapper and Build APK
+      - name: Setup Gradle Wrapper
         run: |
           if [ ! -f "gradlew" ]; then
             gradle wrapper
           fi
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK Artifact
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace -x test -x lint -x lintVitalRelease
+
+      - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: AiTrade-APK
-          path: app/build/outputs/apk/**/*.apk
+          name: AiTrade-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
